@@ -1,0 +1,74 @@
+---
+title: "What is R Markdown?"
+author: ""
+date: ''
+output:
+  html_document:
+      number_sections: false
+---
+
+**Welcome to R Markdown!**
+
+# What is it about? 
+
+In the world of reproducible research, you want your work and your analysis to be easily reproduced by other researchers. Otherwise, how am I going to believe that you have analyzed your data properly?\
+\
+**R Markdown allows you to create documents that serve as a neat record of your analysis**. With RMarkdown you can present your **code** alongside its output (graphs, tables, etc.) with conventional text to explain it, a bit like a notebook. You can also share your file by uploading it to an **online repository such as Github**.
+
+
+## Create an R Markdown (.Rmd) file
+
+* To get R Markdown working in RStudio, you need the `rmarkdown` package, which you can get from `CRAN` by running the following commands in R or RStudio:
+
+```{r , include=TRUE, echo=TRUE}
+#install.packages("rmarkdown")
+#library(rmarkdown)
+```
+
+* Create a new RMarkdown file (.Rmd) by selecting: `File -> New File -> R Markdown`, then choose the file type you want to create.\
+
+
+## YAML header material
+
+The YAML header is the top section of an R Markdown script and it is enclosed by `---`. By default it includes:\
+
+* Title\
+
+* Author\
+
+* Date\
+
+* File Type (for the output)\
+\
+
+**IT IS TIME TO CREATE YOUR FIRST .Rmd FILE.** To compile your .Rmd file, you should press the `Knit` button in the taskbar.
+
+
+## Markdown syntax
+
+R Markdown makes use of [Markdown syntax](https://www.markdownguide.org/basic-syntax).
+
+
+## Insert your code from an R script into a .Rmd file
+
+Code chunks should be enclosed by three backwards apostrophes ` ``` `. Example of these code chunks include:
+
+```{r}
+sample <- rnorm(10, mean = 0, sd = 1)
+```
+
+* The `echo` option: this allows you to hide a particular code chunk from appearing in the final document, but still showing only the output of this chunk. Simply, set `echo = FALSE` in the code chunk instructions.\
+
+* You might want to hide the code and the output in the final .html file. To do this you can use, `include = FALSE`. 
+
+```{r , include=TRUE, echo=FALSE}
+plot(cars)
+```
+
+
+
+
+
+
+
+

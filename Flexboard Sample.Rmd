@@ -1,0 +1,41 @@
+---
+title: "Dygraphs"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+---
+
+```{r}
+library(flexdashboard)
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### Articles per Day
+
+
+```{r}
+computeArticles = function(...) return(45)
+articles <- computeArticles()
+valueBox(articles, icon = "fa-pencil")
+```
+
+### Comments per Day
+
+```{r}
+computeComments = function(...) return(126)
+comments <- computeComments()
+valueBox(comments, icon = "fa-comments")
+```
+
+### Spam per Day
+
+```{r}
+computeSpam = function(...) return(15)
+spam <- computeSpam()
+valueBox(spam, 
+         icon = "fa-trash",
+         color = ifelse(spam > 10, "warning", "primary"))
+```
