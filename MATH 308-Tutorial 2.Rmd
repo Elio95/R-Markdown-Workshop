@@ -1,0 +1,299 @@
+---
+title: "MATH 308-Tutorial 2"
+author: "Elio Abi Younes"
+output: learnr::tutorial
+runtime: shiny_prerendered
+description: "Welcome to tutorial 2-MATH 308"
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Principal Components Analysis (PCA)
+\
+A part of the analysis in this tutorial is from the book "An Introduction to Statistical Learning with Applications in R" by James, Gareth, et al.
+\
+\
+
+*We are going to perform PCA on the `USArrests` data set, which is part of the `base` R package.*
+\
+\
+For each of the $50$ states in the United States, the data set contains the number of arrests
+per $100,000$ residents for each of three crimes: **Assault**, **Murder**, and **Rape**. It also includes the variable **UrbanPop**, the percentage of the population in each state living in urban areas.
+
+### 1.
+Import the data set and check its rows and columns using the functions `row.names` and `names`.
+
+```{r q1, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q1-hint}
+states =row.names(USArrests)
+names(USArrests )
+```
+
+### 2-a.
+The `apply()` function allows to apply a function to each row or column of the data. Examine the mean and variance of the variables in the data using this function.
+
+```{r q2, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q2-hint}
+#The second input denotes whether we wish to compute the mean of the rows, 1, or the columns, 2.
+apply(USArrests , 2, mean)
+apply(USArrests , 2, var)
+```
+
+### 2-b.
+```{r quiz0}
+question("What do you notice? Pick the correct answer(s)",
+    answer("The variables have vastly different means", correct = TRUE),
+    answer("The variables have constant variance"),
+    answer("There are on average three times as many rapes as murders", correct = TRUE),
+    answer("There are on average more than eight times as many assaults as rapes", correct = TRUE)
+  )
+```
+
+Notice also that the variables have vastly different variances. The **UrbanPop** variable measures the percentage of the population in each state living in an urban area, which is not a comparable number to the number of rapes in each state per 100,000 individuals.
+
+### 2-c.
+
+```{r quiz1}
+question("Based on the above results, is it important to standardize the variables before performing PCA?",
+    answer("Yes", correct = TRUE),
+    answer("No")
+  )
+```
+
+If we do not scale the variables before performing PCA, then most of the principal components that we will get would be driven by the **Assault** variable, since it has the largest mean and variance. Therefore, it is important to standardize the
+variables, to have mean zero and standard deviation one, before performing PCA.
+
+### 3-a.
+Perform PCA using the `prcomp()` function (this is one of several functions in R that perform PCA).
+
+
+```{r q3, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q3-hint}
+#By default, the prcomp() function centers the variables to have mean zero.
+#By using the option scale=TRUE, we scale the variables to have standard deviation one.
+pr.out =prcomp (USArrests , scale =TRUE)
+```
+
+### 3-b.
+The output from `prcomp()` contains a number of useful quantities. Use the function `names` to check the output quatities. 
+
+```{r q4, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q4-hint}
+names(pr.out)
+```
+
+
+### 3-c.
+Verify the following statements by checking the output of each quantity.\
+\
+-The center and scale components correspond to the means and standard deviations of the variables that were used for scaling prior to implementing PCA.\
+-The rotation matrix provides the principal component loadings; each column of `rotation` contains the corresponding principal component
+loading vector.
+
+```{r q5, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q5-hint}
+pr.out$center
+pr.out$scale
+pr.out$rotation
+```
+
+Notice that there are four distinct principal components. Recall that in general, there are $\min(n-1,p)$ informative principal
+components in a data set with $n$ observations and $p$ variables.
+
+### 3-d.
+A nice property of using the function `prcomp()` is that we do NOT need to explicitly multiply the data by the principal component loading vectors in order to obtain the principal component score vectors. Rather, this is already included in the output and it is noted by the column x of dimension $50\times 4$. Verify this dimension and the corresponding output.
+
+```{r q6, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q6-hint}
+dim(pr.out$x)
+head(pr.out$x)
+```
+
+The $50\times 4$ matrix x has as its columns the principal component score vectors. That is, the $k^{th}$ column is
+the $k^{th}$ principal component score vector.
+
+### 4-a.
+Plot the first two principal components using the function `biplot()`.
+
+```{r q7, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q7-hint}
+#The scale=0 argument ensures that the arrows are scaled to represent the loadings.
+#Other values for scale give slightly different biplots with different interpretations.
+biplot (pr.out , scale =0)
+
+#Note: the principal components are only unique up to a sign change, so we can rotate the axis by making a few small changes:
+pr.out$rotation=-pr.out$rotation
+pr.out$x=-pr.out$x
+biplot (pr.out , scale =0)
+```
+
+
+### 4-b.
+```{r quiz2}
+question("Based on the above analysis and plot, check all statements that hold:",
+    answer("The first loading vector places approximately equal weight on Assault, Murder, and Rape, with much less weight on UrbanPop.", correct = TRUE),
+    answer("The first principle component roughly corresponds to a measure of overall rates of serious crimes.", correct = TRUE),
+    answer("The second loading vector places most of its weight on UrbanPop and much less weight on the other three features.", correct = TRUE),
+    answer("The second principle component roughly corresponds to the level of urbanization of the state.", correct = TRUE),
+    answer("The crime-related variables (Murder, Assault, and Rape) are located close to each other, and the UrbanPop variable is far from
+the other three.", correct = TRUE),
+    answer("The crime-related variables are correlated with each other.", correct = TRUE),
+    answer("We can say that states with high murder rates tend to have high assault and rape rates.", correct = TRUE),
+    answer("The UrbanPop variable is less correlated with the other three.", correct = TRUE),
+    answer("Based on the loading vectors, we can say that states with large positive scores on the first component,
+such as California, Nevada and Florida, have high crime rates, while states like North Dakota, with negative scores on the first component, have low crime rates. ", correct = TRUE),
+    answer("California has a high score on the second component, indicating a high level of urbanization, while the opposite is true for states like Mississippi. ", correct = TRUE),
+    answer("States close to zero on both components, such as Indiana, have approximately average levels of both crime and urbanization.", correct = TRUE)
+)
+```
+
+
+### 4-c.
+Compute the variance explained by each principal component.
+
+```{r q8, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q8-hint}
+#The prcomp() function outputs the standard deviation of each principal component.
+pr.out$sdev
+#The variance  is obtained by squaring these values
+pr.var =pr.out$sdev ^2
+pr.var
+```
+
+### 4-d.
+compute the proportion of variance explained by each principal component (simply divide the variance explained by each principal component
+by the total variance explained by all principal components).
+
+```{r q9, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q9-hint}
+pve=pr.var/sum(pr.var )
+pve
+```
+
+Notice that the first principal component explains $62\%$ of the variance in the data, the next principal component explains $24.7\%$ of the variance, and so on.\
+\
+Together, the first two principal components explain almost $87\%$ of the variance in the data, and the last two principal components
+explain only $13\%$ of the variance. This means that the biplot in **question 4-a.** provides a pretty accurate summary of the data using just two dimensions.
+
+### 4-e.
+Plot the proportion of variance explained by each principal component (PVE), as well as the cumulative PVE using the function `cumsum()`.
+
+```{r q10, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q10-hint}
+plot(pve , xlab=" Principal Component ", ylab=" Proportion of Variance Explained ", ylim=c(0,1) ,type='b')
+#The function cumsum() computes the cumulative sum of the elements of a numeric vector
+plot(cumsum (pve ), xlab=" Principal Component ", ylab ="Cumulative Proportion of Variance Explained ", ylim=c(0,1) ,type='b')
+#You can also use the screeplot() function as shown in the lecture.
+```
+
+
+### 5.
+Repeat the analysis in questions 3 and 4 without scaling the variables.
+
+```{r q11, exercise=TRUE, exercise.eval=TRUE}
+
+```
+
+```{r q11-hint}
+#3-Performing PCA
+pr.out.unscale =prcomp (USArrests , scale =FALSE)
+pr.out.unscale$center
+pr.out.unscale$scale
+pr.out.unscale$rotation
+head(pr.out.unscale$x)
+
+#4-Creating the corresponding biplot
+pr.out.unscale$rotation=-pr.out.unscale$rotation
+pr.out.unscale$x=-pr.out.unscale$x
+biplot (pr.out.unscale , scale =0)
+```
+
+Does it matter that we scale the variables? Why?
+\
+\
+In these data, the variables are measured in different units; Murder, Rape, and Assault are
+reported as the number of occurrences per 100, 000 people, and UrbanPop
+is the percentage of the state's population that lives in an urban area.
+As mentioned earlier, these four variables have vastly different variance.
+Consequently, if we perform PCA on the unscaled variables, then
+the first principal component loading vector will have a very large loading
+for Assault, since that variable has by far the highest variance (which we can see in the plots of unscaled data).\
+**Therefore, scaling does indeed have a substantial effect on the results obtained.**\
+\
+*Remark: In certain settings, however, the variables may be measured in the same units, and thus, we might not wish to scale the variables to have standard deviation one before performing PCA.*
+
+
+## Discussion: How many principal components are needed?
+We usually are not interested in all of the principal components; rather, we would like to use just the first few principal components in order to visualize or interpret the data. It is preferable to use the smallest number of principal components required to get a good understanding of the data.\
+**There is no single answer to the choice of principal components.**
+\
+\
+We typically examine the scree plot shown in **question 4-e.** to decide on the number of principal components required to visualize the data. As explained in the previous section, we choose the smallest number of principal components that are required in order to explain a sizable amount of the variation in the data. We can simply look at the scree plot and search for a point at which the proportion of variance explained by each subsequent principal component drops off. This is often referred to as an *elbow* in the scree plot. If we inspect our plot we can conclude that a fair amount of variance is explained by the first two principal components, and that there is an elbow after the second component.
+
+
+## PCA and Regression
+We have already mentioned that before PCA is performed, the variables should be centered to have mean zero. Furthermore, the results obtained when we perform PCA will also depend on whether the variables have been individually scaled. However, in some other supervised and unsupervised learning techniques, such as linear regression, scaling the variables has no effect. 
+\
+\
+In linear regression for example, multiplying a variable by a factor of $c$ will simply lead to
+multiplication of the corresponding coefficient estimate by a factor of $1/c$,
+and thus will not affect the model obtained.
+\[
+y=a_0+\frac{1}{c}a_1\times cx_1+a_2x_2
+\]
+Another application of PCA in regression analysis is **Principal Component Regression (PCR)**. Instead of regressing the dependent variable on the explanatory variables directly, PCR consists of performing regression using the principal component score vectors as features. A common practice is to use only a subset of all the principal components for regression instead of the full data. This can lead to less noisy results, since it is often the case that the most explained variance in a data set is concentrated in its first few principal components.
+\
+\
+**Ridge Regression** is a technique for analyzing multiple regression data that suffer from multicollinearity and is often used to control the over-fitting phenomenon by adding a degree of bias to the regression estimates, i.e. adding a penalty term to the error function in order to discourage the coefficients from reaching large values.
+\
+\
+PCR is very similar to ridge regression as both operate via the principal components of the input matrix.\
+-Ridge regression shrinks the coefficients of the principal components, shrinking more depending on the size of the corresponding eigenvalue;\
+-Principal components regression discards the first few smallest eigenvalue components.
+
+## Image Compression with PCA
+Image compression with principal component analysis is a frequently occurring application of the dimension reduction technique. An image is a matrix of pixels represented by RGB color values. Thus, principal component analysis can be used to
+reduce the dimensions of the matrix (image) and project those new dimensions to reform the image that retains its qualities but is smaller in k-weight.\
+\
+Check this guide for more details on how to use PCA to compress images. As the number of principal components used to project the new data increases, the quality and representation compared to the original image improve.\
+\
+https://rpubs.com/aaronsc32/image-compression-principal-component-analysis
+
+
+
+
+
+
